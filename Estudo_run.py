@@ -1,7 +1,7 @@
 from Estudo_recon import Study_Metabolism
 from Estudo_database import Study_Signalling
 import cobra
-from file_utils import pickle_object, read_pickle
+from file_utils import pickle_object
 import pandas as pd
 
 
@@ -12,7 +12,8 @@ class Metabolic_Signalling_Network():
         self.metabolism_data = Study_Metabolism()
         self.macthed_genes = {}
         self.model = None
-        self.res_wt_ko = {}
+        self.res_fba = {}
+        self.res_fva = {}
             
     def __initialize_study_signalling(self):
         self.signalling_path.import_data() #pode ser vazio ou 'study_and_database'
@@ -38,32 +39,41 @@ class Metabolic_Signalling_Network():
         return self.macthed_genes
         
     def simulate_ko(self):
-        for gene in self.macthed_genes.keys():
+        for gene in self.macthed_genes:
             gene_id = self.macthed_genes[gene]
             with self.model as temp_model:
                temp_model.genes.get_by_id(gene_id).knock_out()
-               self.res_wt_ko[gene] = temp_model               
+               self.res_fba[gene] = temp_model.optimize()
+               self.res_fva[gene] = cobra.flux_analysis.flux_variability_analysis(temp_model)
     
     def simulate_wt(self):
-        self.res_wt_ko['wt'] = self.model
+        self.res_fba['WT'] = self.model.optimize()
+        self.res_fva['WT'] = cobra.flux_analysis.flux_variability_analysis(self.model)
     
     def run (self):
         self.initialize()
         self.match_genes()
         self.simulate_wt()
         self.simulate_ko()
+        self.save_simulation()
     
-    def save_simulation_fba(self):
-        pickle_object(self.res_wt_ko, 'res_wt_ko.pkl')
+    def save_simulation(self):
+        pickle_object(self.res_fba, 'res_fba.pkl')
+        pickle_object(self.res_fva, 'res_fva.pkl')
             
-    def get_results_simulation_fba(self):
-        return pd.DataFrame({k:v.optimize().fluxes for k,v in self.res_wt_ko.items()})
+    def get_results(self, res_from = 'fba'):
+        if res_from == 'fba':
+            return pd.DataFrame({k:v.fluxes for k,v in self.res_fba.items()})
+        elif res_from == 'fva':
+            return pd.DataFrame({k:v.fluxes for k,v in self.res_fva.items()})
     
-    def show_item(self, item = 'biomass_reaction'):
-        return pd.DataFrame({k:v.optimize().fluxes for k,v in self.res_wt_ko.items()}).loc['biomass_reaction',:]
-    
+    def show_item(self, res_from = 'fba', item = 'biomass_reaction'):
+        if res_from == 'fba':
+            return pd.DataFrame({k:v.fluxes for k,v in self.res_fba.items()}).loc['biomass_reaction',:]
+        elif res_from == 'fva':
+            return pd.DataFrame({k:v.fluxes for k,v in self.res_fva.items()}).loc['biomass_reaction',:]
     
 if __name__ == "__main__":
     Study = Metabolic_Signalling_Network()
     Study.run()
-    print(Study.get_results_simulation_fba())
+    print(Study.get_results())
