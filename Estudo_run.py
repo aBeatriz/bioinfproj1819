@@ -16,7 +16,7 @@ class Metabolic_Signalling_Network():
         self.res_fva = {}
             
     def __initialize_study_signalling(self):
-        self.signalling_path.import_data() #pode ser vazio ou 'study_and_database'
+        self.signalling_path.import_data('study_and_database') #pode ser vazio ou 'study_and_database'
         self.signalling_path.run()
     
     def __initialize_study_metabolism(self):
