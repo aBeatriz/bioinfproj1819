@@ -85,7 +85,6 @@ class Study_Signalling ():
                         to_visit.append(target)
             elif tf not in self.database_data and tf not in self.path_end:
                 self.path_end.append(tf)
-            to_visit.remove(tf)
     
     def get_path_ends(self):
         return self.path_end
