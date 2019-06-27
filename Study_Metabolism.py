@@ -67,7 +67,5 @@ class Study_Metabolism():
            
 if __name__ == "__main__":
     Metabolic_data = Study_Metabolism()
-    Metabolic_data.import_recon('recon')
     Metabolic_data.save_recon()
     Metabolic_data.run()    
-    print(len(Metabolic_data.get_genes_with_ids()))
