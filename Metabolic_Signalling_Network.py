@@ -52,23 +52,23 @@ class Metabolic_Signalling_Network():
             with self.model as temp_model:
                temp_model.genes.get_by_id(gene_id).knock_out()
                self.res_fba[gene] = temp_model.optimize()
-#                   self.res_fva[gene] = cobra.flux_analysis.flux_variability_analysis(temp_model)
+               self.res_fva[gene] = cobra.flux_analysis.flux_variability_analysis(temp_model)
     
     def simulate_nc(self):
         self.res_fba['NC'] = self.model.optimize()
-#        self.res_fva['NC'] = cobra.flux_analysis.flux_variability_analysis(self.model)
+        self.res_fva['NC'] = cobra.flux_analysis.flux_variability_analysis(self.model)
     
     def run (self):
         self.initialize()
         self.match_genes()
-#        self.simulate_nc()
-#        self.simulate_ko()
+        self.simulate_nc()
+        self.simulate_ko()
         self.save_simulation()
     
     def save_simulation(self):
-#        pickle_object(self.res_fba, 'res_fba.pkl')
+        pickle_object(self.res_fba, 'res_fba.pkl')
         pickle_object(self.matched_genes, 'matched.pkl')
-#        pickle_object(self.res_fva, 'res_fva.pkl')
+        pickle_object(self.res_fva, 'res_fva.pkl')
             
     def get_results(self, res_from = 'fba'):
         if res_from == 'fba':
@@ -90,20 +90,6 @@ class Metabolic_Signalling_Network():
         elif res_from == 'fva':
             return pd.DataFrame({k:v.fluxes for k,v in self.res_fva.items()}).loc['biomass_reaction',:]
     
-    def get_genes_associated_bc_literature(self):
-        genes_literature = []
-        with open('gene_breast_cancer.txt', 'r') as file:
-            lines = file.readlines()
-            for l in range(1, len(lines)):
-                line = lines[l]
-                genes_literature.append(line.split('\t')[5])
-        res = []
-        for gene in self.matched_genes:
-            if gene in genes_literature:
-                res.append(self.matched_genes[gene].split('.')[0])
-        with open('genes_bc_macthed.txt', 'w') as file:
-            file.write('\n'.join(res))
-    
     def fva_results(self):
         res = {'blocked_r':None, 'essential_r':None, 'essential_g':None}
         for k in self.res_fva:
@@ -118,8 +104,3 @@ class Metabolic_Signalling_Network():
 if __name__ == "__main__":
     Study = Metabolic_Signalling_Network()
     Study.run()
-#    Study.get_results()
-#    Study.get_results('matched')
-#    print((Study.show_item()))
-#    print(Study.fva_results())
-    print(Study.get_matched_genes().keys())
