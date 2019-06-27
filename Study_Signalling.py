@@ -106,7 +106,7 @@ class Study_Signalling ():
     
     def run(self):
         self.__build_pathway(self.get_metabolites_model())
-#        self.save_data()
+        self.save_data()
         
     def print_final_pathway(self):
         for tf in self.final_pathway.keys():
@@ -150,8 +150,3 @@ if __name__ == "__main__":
     Pathway.import_data('study_and_database')   
     Pathway.save_initial_data()
     Pathway.run()
-#    Pathway.active_proteins()
-#    Pathway.save_data()
-    print('ends -> ', len(Pathway.get_path_ends()))
-    print('path.keys -> ', len(Pathway.get_pathways().keys()))
-    print('nodes -> ', len(Pathway.nodes))
