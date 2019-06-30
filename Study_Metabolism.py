@@ -41,11 +41,11 @@ class Study_Metabolism():
     def __conversion_genes_ids(self): #do de conversion of NCBI IDs to symbols
         for i in range(len(self.recon.genes)):
             gene_id = self.recon.genes[i].id
-            ncbi_id = gene_id.split('.')[0] #primeira parte corresponde ao numero no ncbi
-            if ncbi_id in self.converter: #nao tem todos
+            ncbi_id = gene_id.split('.')[0]
+            if ncbi_id in self.converter:
                 symbol = self.converter[ncbi_id]
-                if symbol not in self.genes: #existem mais que uma entrada para cada gene
-                    self.genes[symbol] = gene_id #atribui-se cada simbolo ao id respetivo que se encontra no recon
+                if symbol not in self.genes:
+                    self.genes[symbol] = gene_id
     
     def get_recon(self): #return the model
         return self.recon
